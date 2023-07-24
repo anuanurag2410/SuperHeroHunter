@@ -1,29 +1,31 @@
-// Retrieving the card container from the DOM
+// Selecting the card container from the DOM
 let cardContainer = document.getElementById('container');
 
-// Event listener attached to the window to execute the code when the page is loaded
+// Event listener attached to dom which is executed when the page is loaded
 window.addEventListener("load", function () {
-     // Getting the favoriteCharacters array from localStorage
-     let favorites = localStorage.getItem("favoriteCharacters");
+     // Getting the favourites array fom localStorage
+     let favourites = localStorage.getItem("favouriteCharacters");
 
-     // If favorites is null, display a message and return
-     if (favorites == null) {
-          cardContainer.innerHTML = "<p class=\"no-characters\">No characters present in Favorites</p>";
+     // if favourites is null the we display nothing and return from there 
+     if (favourites == null) {
+          cardContainer.innerHTML = "<p class=\"no-characters\">No characters present in Favourites</p>"
           return;
      }
-     // If favorites is not null, parse it to convert it into an array
+     // if NOT NULL the paring it to convert it to array
      else {
-          favorites = JSON.parse(localStorage.getItem("favoriteCharacters"));
+          favourites = JSON.parse(this.localStorage.getItem("favouriteCharacters"));
      }
 
-     // If all the characters are deleted from favorites and there are no characters left to display
-     if (favorites.length === 0) {
-          cardContainer.innerHTML = "<p class=\"no-characters\">No characters present in Favorites</p>";
+     // if all the characters are deleted from favourites and not character left for displaying
+     if (favourites.length == 0) {
+          cardContainer.innerHTML = "<p class=\"no-characters\">No characters present in Favourites</p>";
           return;
      }
 
      cardContainer.innerHTML = "";
-     favorites.forEach(character => {
+     // console.log(favourites)
+     favourites.forEach(character => {
+          // console.log(character);
           cardContainer.innerHTML +=
                `
                <div class="flex-col card">
@@ -47,65 +49,72 @@ window.addEventListener("load", function () {
                          <span>${character.portraitImage}</span>
                          <span>${character.squareImage}</span>
                     </div>
-                    <button class="btn remove-btn"><i class="fa-solid fa-heart-circle-minus"></i> &nbsp; Remove from Favorites</button>
+                    <button class="btn remove-btn"><i class="fa-solid fa-heart-circle-minus"></i> &nbsp; Remove from Favourites</button>
                </div>
-          `;
-     });
-     // Adding appropriate event listeners to the buttons after they are inserted into the DOM
-     addEvent();
-});
+          `
 
-// Function for attaching event listeners to buttons
+     })
+     // Adding the appropritate events to the buttons after they are inserted in dom 
+     addEvent();
+})
+
+// Function for attacthing eventListener to buttons
 function addEvent() {
      let removeBtn = document.querySelectorAll(".remove-btn");
-     removeBtn.forEach((btn) => btn.addEventListener("click", removeCharacterFromFavorites));
+     removeBtn.forEach((btn) => btn.addEventListener("click", removeCharacterFromFavourites))
 
      let characterInfo = document.querySelectorAll(".character-info");
      characterInfo.forEach((character) => character.addEventListener("click", addInfoInLocalStorage));
 }
 
-function removeCharacterFromFavorites() {
-     // Storing the ID of the character to be deleted in a variable
+
+function removeCharacterFromFavourites() {
+     
+     // Storing the Id of character in a voriable
      let idOfCharacterToBeDeleted = this.parentElement.children[2].innerHTML.substring(5);
 
-     // Getting the favorites array that stores objects of characters
-     let favorites = JSON.parse(localStorage.getItem("favoriteCharacters"));
-     // favoritesCharacterIDs is taken from localStorage for deleting the ID of the character that is deleted from favorites
-     let favoritesCharacterIDs = new Map(JSON.parse(localStorage.getItem("favoritesCharacterIDs")));
-     // Deleting the character's ID from favoritesCharacterIDs map
-     favoritesCharacterIDs.delete(`${idOfCharacterToBeDeleted}`);
+     // getting the favourites array which stores objects of character  
+     let favourites = JSON.parse(localStorage.getItem("favouriteCharacters"));
+     // favouritesCharacterIDs is taken from localStorage for deleting the ID of the character which is deleted from favourites
+     let favouritesCharacterIDs = new Map(JSON.parse(localStorage.getItem("favouritesCharacterIDs")));
+     // deleting the characters id from favouritesCharacterId map
+     favouritesCharacterIDs.delete(`${idOfCharacterToBeDeleted}`);
 
-     // Deleting the character from the array whose ID matches
-     favorites.forEach(function (favorite, index) {
-          if (favorite.id == idOfCharacterToBeDeleted) {
-               favorites.splice(index, 1);
+
+     // deleting the character form array whose id is matched 
+     favourites.forEach(function (favourite, index) {
+          if (favourite.id == idOfCharacterToBeDeleted) {
+               // console.log(favourite)
+               favourites.splice(index, 1);
           }
      });
 
-     // If all the characters are deleted from favorites and there are no characters left to display
-     if (favorites.length === 0) {
-          cardContainer.innerHTML = "<p class=\"no-characters\">No characters present in Favorites</p>";
+     // if all the characters are deleted from favourites and not character left for displaying
+     if (favourites.length == 0) {
+          cardContainer.innerHTML = "<p class=\"no-characters\">No characters present in Favourites</p>";
      }
+     // console.log(favourites);
 
      // Updating the new arrays in localStorage
-     localStorage.setItem("favoriteCharacters", JSON.stringify(favorites));
-     localStorage.setItem("favoritesCharacterIDs", JSON.stringify([...favoritesCharacterIDs]));
+     localStorage.setItem("favouriteCharacters", JSON.stringify(favourites));
+     localStorage.setItem("favouritesCharacterIDs", JSON.stringify([...favouritesCharacterIDs]));
 
-     // Removing the element from the DOM
+     // Removing the element from DOM
      this.parentElement.remove();
 
-     // Displaying the "Removed from favorites" toast in the DOM
+     // displaying the "Removed from favourites" toast in DOM
      document.querySelector(".remove-toast").setAttribute("data-visiblity", "show");
-     // Removing the "Removed from favorites" toast from the DOM
+     // Removing the "Removed from favourites" toast form DOM
      setTimeout(function () {
           document.querySelector(".remove-toast").setAttribute("data-visiblity", "hide");
      }, 1000);
 }
 
-// Function that stores the info object of the character for which the user wants to see the info
+
+// Function which stores the info object of character for which user want to see the info 
 function addInfoInLocalStorage() {
-     // This function basically stores the data of the character in localStorage.
-     // When the user clicks on the info button and the info page is opened, that page fetches the heroInfo and displays the data
+     // This function basically stores the data of character in localStorage.
+     // When user clicks on the info button and when the info page is opened that page fetches the heroInfo and display the data  
      let heroInfo = {
           name: this.parentElement.children[7].children[1].innerHTML,
           description: this.parentElement.children[7].children[5].innerHTML,
@@ -115,19 +124,20 @@ function addInfoInLocalStorage() {
           portraitImage: this.parentElement.children[7].children[7].innerHTML,
           id: this.parentElement.children[7].children[0].innerHTML,
           landscapeImage: this.parentElement.children[7].children[6].innerHTML
-     };
+     }
 
      localStorage.setItem("heroInfo", JSON.stringify(heroInfo));
 }
 
-// Theme Changing
+
+/*-----------------------------------------------------  Theme Changing  -------------------------------------------------  */
 
 // Selection of theme button
 let themeButton = document.getElementById("theme-btn");
 
 themeButton.addEventListener("click", themeChanger);
 
-// IIFE function which checks the localStorage and applies the previously set theme
+// IIFE fuction which checks the localStorage and applies the presviously set theme
 (function () {
      let currentTheme = localStorage.getItem("theme");
      if (currentTheme == null) {
@@ -153,9 +163,10 @@ themeButton.addEventListener("click", themeChanger);
      }
 })();
 
-// Function for handling theme button changes
+// function for handeling theme button changes
 function themeChanger() {
      let root = document.getElementById("root");
+     // let themeIcon = document.querySelector("#themeButton i");
      if (root.getAttribute("color-scheme") == "light") {
           root.setAttribute("color-scheme", "dark");
           themeButton.innerHTML = `<i class="fa-solid fa-sun"></i>`;

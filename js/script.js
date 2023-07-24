@@ -1,200 +1,302 @@
-// Retrieve DOM elements
+// Public key
+// 9ab871748d83ae2eb5527ffd69e034de
+
+// Private Key
+// ad79003cf7316d9bd72c6eda71d1c93d7e807e90
+
+// hash
+// 1ad79003cf7316d9bd72c6eda71d1c93d7e807e909ab871748d83ae2eb5527ffd69e034de
+// md5(hash) = d35377547e551cd64a60657d2517bb7f
+
+//*-------------------------------------- Selecting the element from DOM ----------------------------------------------------
 let searchBar = document.getElementById("search-bar");
 let searchResults = document.getElementById("search-results");
 
-// Add event listener to the search bar
-searchBar.addEventListener("input", () => searchHeroes(searchBar.value));
+// Adding eventListener to search bar
+searchBar.addEventListener("input", () => searchHeros(searchBar.value));
 
-// Function to search superheroes using the Marvel API
-async function searchHeroes(searchText) {
-    if (searchText.length === 0) {
-        searchResults.innerHTML = ``;
-        return;
-    }
+// function for API call
+async function searchHeros(textSearched) {
 
-    // Marvel API credentials
-    const PUBLIC_KEY = "5034563621fa2511fc3a1badc87481c4";
-    const PRIVATE_KEY = "fec57671b7ca7cc19b95191ef7718c65399be1d2";
-    const timestamp = new Date().getTime();
-    const hash = "d35377547e551cd64a60657d2517bb7f"; // MD5 hash
+      let PUBLIC_KEY = "5034563621fa2511fc3a1badc87481c4";
+    let PRIVATE_KEY = "fec57671b7ca7cc19b95191ef7718c65399be1d2";
 
-    try {
-        // Fetch data from the Marvel API using the provided search text, public key, hash, and timestamp
-        const response = await fetch(`https://gateway.marvel.com/v1/public/characters?nameStartsWith=${searchText}&apikey=${PUBLIC_KEY}&hash=${hash}&ts=${timestamp}`);
-        const data = await response.json();
+     let ts = new Date().getTime();
+ let hash = CryptoJS.MD5(ts + PRIVATE_KEY + PUBLIC_KEY).toString();
+     
+     // if there is no text written in the search bar then nothing is displayed 
+     if (textSearched.length == 0) {
+          searchResults.innerHTML = ``;
+          return;
+     }
 
-        // Display the search results
-        showSearchResults(data.data.results);
-    } catch (error) {
-        console.error("Error fetching data:", error);
-    }
+     // API call to get the data 
+     await fetch(`https://gateway.marvel.com/v1/public/characters?nameStartsWith=${textSearched}&apikey=9ab871748d83ae2eb5527ffd69e034de&hash=d35377547e551cd64a60657d2517bb7f?ts=1`)
+          .then(res => res.json()) //Converting the data into JSON format
+          .then(data => showSearchedResults(data.data.results)) //sending the searched results characters to show in HTML
 }
 
-// Function to display the search results in the DOM
-function showSearchResults(heroes) {
-    searchResults.innerHTML = ``;
-    let count = 1;
+// Function for displaying the searched results in DOM
+// An array is accepted as argument 
+// SearchedHero is the array of objects which matches the string entered in the searched bar
+function showSearchedResults(searchedHero) {
 
-    // Loop through the searched heroes and display up to 5 results
-    for (const hero of heroes) {
-        if (count > 5) break;
 
-        // Create HTML elements to display each superhero's information
-        searchResults.innerHTML +=
-            `
-            <li class="flex-row single-search-result">
-                <div class="flex-row img-info">
-                    <img src="${hero.thumbnail.path + '/portrait_medium.' + hero.thumbnail.extension}" alt="">
-                    <div class="hero-info">
-                        <a class="character-info" href="./more-info.html">
-                            <span class="hero-name">${hero.name}</span>
-                        </a>
+     // IDs of the character which are added in the favourites 
+     // Used for displaying the appropriate button in search results i.e
+     // if the id exist in this array then we display "Remove from favourites" button otherwise we display "Add to favourites button"
+     // favouritesCharacterIDs is a map which contains id of character as key and true as value 
+     let favouritesCharacterIDs = localStorage.getItem("favouritesCharacterIDs");
+     if(favouritesCharacterIDs == null){
+          // If we did't got the favouritesCharacterIDs then we iniitalize it with empty map
+          favouritesCharacterIDs = new Map();
+     }
+     else if(favouritesCharacterIDs != null){
+          // If the we got the favouritesCharacterIDs in localStorage then parsing it and converting it to map
+          favouritesCharacterIDs = new Map(JSON.parse(localStorage.getItem("favouritesCharacterIDs")));
+     }
+
+     searchResults.innerHTML = ``;
+     // count is used to count the result displayed in DOM
+     let count = 1;
+
+     // iterating the searchedHero array using for loop
+     for (const key in searchedHero) {
+          // if count <= 5 then only we display it in dom other results are discarded
+          if (count <= 5) {
+               // getting the single hero 
+               // hero is the object that we get from API
+               let hero = searchedHero[key];
+               // Appending the element into DOM
+               searchResults.innerHTML +=
+                    `
+               <li class="flex-row single-search-result">
+                    <div class="flex-row img-info">
+                         <img src="${hero.thumbnail.path+'/portrait_medium.' + hero.thumbnail.extension}" alt="">
+                         <div class="hero-info">
+                              <a class="character-info" href="./more-info.html">
+                                   <span class="hero-name">${hero.name}</span>
+                              </a>
+                         </div>
                     </div>
-                </div>
-                <div class="flex-col buttons">
-                    <button class="btn add-to-fav-btn">${getFavButtonIcon(hero.id)} &nbsp; ${getFavButtonText(hero.id)}</button>
-                </div>
-                <div style="display:none;">
-                    <span>${hero.name}</span>
-                    <span>${hero.description}</span>
-                    <span>${hero.comics.available}</span>
-                    <span>${hero.series.available}</span>
-                    <span>${hero.stories.available}</span>
-                    <span>${hero.thumbnail.path + '/portrait_uncanny.' + hero.thumbnail.extension}</span>
-                    <span>${hero.id}</span>
-                    <span>${hero.thumbnail.path + '/landscape_incredible.' + hero.thumbnail.extension}</span>
-                    <span>${hero.thumbnail.path + '/standard_fantastic.' + hero.thumbnail.extension}</span>
-                </div>
-            </li>
-        `;
-
-        count++;
-    }
-
-    // Attach events to the buttons after they are inserted in the DOM
-    attachButtonEvents();
+                    <div class="flex-col buttons">
+                         <!-- <button class="btn"><i class="fa-solid fa-circle-info"></i> &nbsp; More Info</button> -->
+                         <button class="btn add-to-fav-btn">${favouritesCharacterIDs.has(`${hero.id}`) ? "<i class=\"fa-solid fa-heart-circle-minus\"></i> &nbsp; Remove from Favourites" :"<i class=\"fa-solid fa-heart fav-icon\"></i> &nbsp; Add to Favourites</button>"}
+                    </div>
+                    <div style="display:none;">
+                         <span>${hero.name}</span>
+                         <span>${hero.description}</span>
+                         <span>${hero.comics.available}</span>
+                         <span>${hero.series.available}</span>
+                         <span>${hero.stories.available}</span>
+                         <span>${hero.thumbnail.path+'/portrait_uncanny.' + hero.thumbnail.extension}</span>
+                         <span>${hero.id}</span>
+                         <span>${hero.thumbnail.path+'/landscape_incredible.' + hero.thumbnail.extension}</span>
+                         <span>${hero.thumbnail.path+'/standard_fantastic.' + hero.thumbnail.extension}</span>
+                    </div>
+               </li>
+               `
+          }
+          count++;
+     }
+     // Adding the appropritate events to the buttons after they are inserted in dom
+     events();
 }
 
-// Function to attach event listeners to buttons
-function attachButtonEvents() {
-    let favouriteButton = document.querySelectorAll(".add-to-fav-btn");
-    favouriteButton.forEach((btn) => btn.addEventListener("click", addToFavourites));
+// Function for attacthing eventListener to buttons
+function events() {
+     let favouriteButton = document.querySelectorAll(".add-to-fav-btn");
+     favouriteButton.forEach((btn) => btn.addEventListener("click", addToFavourites));
 
-    let characterInfo = document.querySelectorAll(".character-info");
-    characterInfo.forEach((character) => character.addEventListener("click", addInfoInLocalStorage));
+     let characterInfo = document.querySelectorAll(".character-info");
+     characterInfo.forEach((character) => character.addEventListener("click", addInfoInLocalStorage))
 }
 
-// Function invoked when "Add to Favourites" or "Remove from Favourites" button is clicked, appropriate action is taken based on the button clicked
+// Function invoked when "Add to Favourites" button or "Remvove from favourites" button is click appropriate action is taken accoring to the button clicked
 function addToFavourites() {
-    // Get the hero ID of the character to be added/removed
-    let heroId = this.parentElement.parentElement.children[2].children[6].innerHTML;
 
-    // Get the favouritesCharacterIDs from localStorage
-    let favouritesCharacterIDs = new Map(JSON.parse(localStorage.getItem("favouritesCharacterIDs")));
+     // If add to favourites button is cliked then
+     if (this.innerHTML == '<i class="fa-solid fa-heart fav-icon"></i> &nbsp; Add to Favourites') {
 
-    if (!favouritesCharacterIDs.has(heroId)) {
-        // If the character ID is not in favourites, add it
-        favouritesCharacterIDs.set(heroId, true);
-        addToFavouritesArray(heroId);
-        this.innerHTML = `<i class="fa-solid fa-heart-circle-minus"></i> &nbsp; Remove from Favourites`;
+          // We cretate a new object containg revelent info of hero and push it into favouritesArray
+          let heroInfo = {
+               name: this.parentElement.parentElement.children[2].children[0].innerHTML,
+               description: this.parentElement.parentElement.children[2].children[1].innerHTML,
+               comics: this.parentElement.parentElement.children[2].children[2].innerHTML,
+               series: this.parentElement.parentElement.children[2].children[3].innerHTML,
+               stories: this.parentElement.parentElement.children[2].children[4].innerHTML,
+               portraitImage: this.parentElement.parentElement.children[2].children[5].innerHTML,
+               id: this.parentElement.parentElement.children[2].children[6].innerHTML,
+               landscapeImage: this.parentElement.parentElement.children[2].children[7].innerHTML,
+               squareImage: this.parentElement.parentElement.children[2].children[8].innerHTML
+          }
 
-        // Show "Added to Favourites" toast
-        showToast("Added to Favourites");
-    } else {
-        // If the character ID is in favourites, remove it
-        favouritesCharacterIDs.delete(heroId);
-        removeFromFavouritesArray(heroId);
-        this.innerHTML = `<i class="fa-solid fa-heart fav-icon"></i> &nbsp; Add to Favourites`;
+          // getting the favourites array which stores objects of character  
+          // We get null is no such array is created earlier i.e user is running the website for the first time
+          let favouritesArray = localStorage.getItem("favouriteCharacters");
 
-        // Show "Remove from Favourites" toast
-        showToast("Removed from Favourites");
-    }
+          // If favouritesArray is null (for the first time favourites array is null)
+          if (favouritesArray == null) {
+               // favourites array is null so we create a new array
+               favouritesArray = [];
+          } else {
+               // if it is not null then we parse so that it becomes an array 
+               favouritesArray = JSON.parse(localStorage.getItem("favouriteCharacters"));
+          }
 
-    // Save the updated favouritesCharacterIDs in localStorage
-    localStorage.setItem("favouritesCharacterIDs", JSON.stringify([...favouritesCharacterIDs]));
+          // favouritesCharacterIDs is taken from localStorage for adding ID of the character which is added in favourites
+          // It is created because when we search for the characters which is already added in favourites we check that if the id of the character exist in this array then we display "Remove form favourites" insted of "Add to favourites"
+          let favouritesCharacterIDs = localStorage.getItem("favouritesCharacterIDs");
+
+          
+          if (favouritesCharacterIDs == null) {
+          // If we did't got the favouritesCharacterIDs then we iniitalize it with empty map
+               favouritesCharacterIDs = new Map();
+          } else {
+               // getting the map as object from localStorage and pasrsing it and then converting into map 
+               favouritesCharacterIDs = new Map(JSON.parse(localStorage.getItem("favouritesCharacterIDs")));
+               // favouritesCharacterIDs = new Map(Object.entries(favouritesCharacterIDs));
+          }
+
+          // again setting the new favouritesCharacterIDs array to localStorage
+          favouritesCharacterIDs.set(heroInfo.id, true);
+          // console.log(favouritesCharacterIDs)
+
+          // adding the above created heroInfo object to favouritesArray
+          favouritesArray.push(heroInfo);
+
+          // Storing the new favouritesCharactersID map to localStorage after converting to string
+          localStorage.setItem("favouritesCharacterIDs", JSON.stringify([...favouritesCharacterIDs]));
+          // Setting the new favouritesCharacters array which now has the new character 
+          localStorage.setItem("favouriteCharacters", JSON.stringify(favouritesArray));
+
+          // Convering the "Add to Favourites" button to "Remove from Favourites"
+          this.innerHTML = '<i class="fa-solid fa-heart-circle-minus"></i> &nbsp; Remove from Favourites';
+          
+          // Displaying the "Added to Favourites" toast to DOM
+          document.querySelector(".fav-toast").setAttribute("data-visiblity","show");
+          // Deleting the "Added to Favourites" toast from DOM after 1 seconds
+          setTimeout(function(){
+               document.querySelector(".fav-toast").setAttribute("data-visiblity","hide");
+          },1000);
+     }
+     // For removing the character form favourites array
+     else{
+          
+          // storing the id of character in a variable 
+          let idOfCharacterToBeRemoveFromFavourites = this.parentElement.parentElement.children[2].children[6].innerHTML;
+          
+          // getting the favourites array from localStorage for removing the character object which is to be removed
+          let favouritesArray = JSON.parse(localStorage.getItem("favouriteCharacters"));
+          
+          // getting the favaourites character ids array for deleting the character id from favouritesCharacterIDs also
+          let favouritesCharacterIDs = new Map(JSON.parse(localStorage.getItem("favouritesCharacterIDs")));
+          
+          // will contain the characters which should be present after the deletion of the character to be removed 
+          let newFavouritesArray = [];
+          // let newFavouritesCharacterIDs = [];
+          
+          // deleting the character from map using delete function where id of character acts as key
+          favouritesCharacterIDs.delete(`${idOfCharacterToBeRemoveFromFavourites}`);
+          
+          // creating the new array which does not include the deleted character
+          // iterating each element of array
+          favouritesArray.forEach((favourite) => {
+               // if the id of the character doesn't matches the favourite (i.e a favourite character) then we append it in newFavourites array 
+               if(idOfCharacterToBeRemoveFromFavourites != favourite.id){
+                    newFavouritesArray.push(favourite);
+               }
+          });
+          
+          // console.log(newFavouritesArray)
+          
+          // Updating the new array in localStorage
+          localStorage.setItem("favouriteCharacters",JSON.stringify(newFavouritesArray));
+          localStorage.setItem("favouritesCharacterIDs", JSON.stringify([...favouritesCharacterIDs]));
+          
+          
+          // Convering the "Remove from Favourites" button to "Add to Favourites" 
+          this.innerHTML = '<i class="fa-solid fa-heart fav-icon"></i> &nbsp; Add to Favourites';
+          
+          // Displaying the "Remove from Favourites" toast to DOM
+          document.querySelector(".remove-toast").setAttribute("data-visiblity","show");
+          // Deleting the "Remove from Favourites" toast from DOM after 1 seconds
+          setTimeout(function(){
+               document.querySelector(".remove-toast").setAttribute("data-visiblity","hide");
+          },1000);
+          // console.log();
+     }     
 }
 
-// Function to add the character info to the favourites array in localStorage
-function addToFavouritesArray(heroId) {
-    let heroInfo = {
-        name: this.parentElement.parentElement.children[2].children[0].innerHTML,
-        description: this.parentElement.parentElement.children[2].children[1].innerHTML,
-        comics: this.parentElement.parentElement.children[2].children[2].innerHTML,
-        series: this.parentElement.parentElement.children[2].children[3].innerHTML,
-        stories: this.parentElement.parentElement.children[2].children[4].innerHTML,
-        portraitImage: this.parentElement.parentElement.children[2].children[5].innerHTML,
-        id: heroId,
-        landscapeImage: this.parentElement.parentElement.children[2].children[7].innerHTML,
-        squareImage: this.parentElement.parentElement.children[2].children[8].innerHTML
-    };
-
-    // Get the current favourites array from localStorage
-    let favouritesArray = JSON.parse(localStorage.getItem("favouriteCharacters")) || [];
-    favouritesArray.push(heroInfo);
-
-    // Save the updated favourites array in localStorage
-    localStorage.setItem("favouriteCharacters", JSON.stringify(favouritesArray));
-}
-
-// Function to remove the character from the favourites array in localStorage
-function removeFromFavouritesArray(heroId) {
-    // Get the current favourites array from localStorage
-    let favouritesArray = JSON.parse(localStorage.getItem("favouriteCharacters")) || [];
-
-    // Filter out the character with the specified ID
-    favouritesArray = favouritesArray.filter((hero) => hero.id !== heroId);
-
-    // Save the updated favourites array in localStorage
-    localStorage.setItem("favouriteCharacters", JSON.stringify(favouritesArray));
-}
-
-// Function to display a toast message for adding/removing from favourites
-function showToast(message) {
-    let toast = document.querySelector(`.${message.toLowerCase()}-toast`);
-    toast.setAttribute("data-visibility", "show");
-    setTimeout(() => {
-        toast.setAttribute("data-visibility", "hide");
-    }, 1000);
-}
-
-// Function to store the character info in localStorage when the user wants to see more info
+// Function which stores the info object of character for which user want to see the info 
 function addInfoInLocalStorage() {
-    let heroInfo = {
-        name: this.parentElement.parentElement.parentElement.children[2].children[0].innerHTML,
-        description: this.parentElement.parentElement.parentElement.children[2].children[1].innerHTML,
-        comics: this.parentElement.parentElement.parentElement.children[2].children[2].innerHTML,
-        series: this.parentElement.parentElement.parentElement.children[2].children[3].innerHTML,
-        stories: this.parentElement.parentElement.parentElement.children[2].children[4].innerHTML,
-        portraitImage: this.parentElement.parentElement.parentElement.children[2].children[5].innerHTML,
-        id: this.parentElement.parentElement.parentElement.children[2].children[6].innerHTML,
-        landscapeImage: this.parentElement.parentElement.parentElement.children[2].children[7].innerHTML,
-        squareImage: this.parentElement.parentElement.parentElement.children[2].children[8].innerHTML
-    };
 
-    localStorage.setItem("heroInfo", JSON.stringify(heroInfo));
+     // This function basically stores the data of character in localStorage.
+     // When user clicks on the info button and when the info page is opened that page fetches the heroInfo and display the data  
+     let heroInfo = {
+          name: this.parentElement.parentElement.parentElement.children[2].children[0].innerHTML,
+          description: this.parentElement.parentElement.parentElement.children[2].children[1].innerHTML,
+          comics: this.parentElement.parentElement.parentElement.children[2].children[2].innerHTML,
+          series: this.parentElement.parentElement.parentElement.children[2].children[3].innerHTML,
+          stories: this.parentElement.parentElement.parentElement.children[2].children[4].innerHTML,
+          portraitImage: this.parentElement.parentElement.parentElement.children[2].children[5].innerHTML,
+          id: this.parentElement.parentElement.parentElement.children[2].children[6].innerHTML,
+          landscapeImage: this.parentElement.parentElement.parentElement.children[2].children[7].innerHTML,
+          squareImage: this.parentElement.parentElement.parentElement.children[2].children[8].innerHTML
+     }
+
+     localStorage.setItem("heroInfo", JSON.stringify(heroInfo));
 }
 
-// Function to toggle between light and dark theme
-function themeChanger() {
-    let root = document.getElementById("root");
-    let themeButton = document.getElementById("theme-btn");
-    let currentTheme = localStorage.getItem("theme");
+/*-----------------------------------------------------  Theme Changing  -------------------------------------------------  */
 
-    if (currentTheme == "light") {
-        root.setAttribute("color-scheme", "dark");
-        themeButton.innerHTML = `<i class="fa-solid fa-sun"></i>`;
-        themeButton.style.backgroundColor = "#FB2576";
-        themeButton.childNodes[0].style.color = "black";
-        localStorage.setItem("theme", "dark");
-    } else if (currentTheme == "dark") {
-        root.setAttribute("color-scheme", "light");
-        themeButton.innerHTML = `<i class="fa-solid fa-moon"></i>`;
-        themeButton.style.backgroundColor = "#0D4C92";
-        themeButton.childNodes[0].style.color = "white";
-        localStorage.setItem("theme", "light");
-    }
-}
-
-// Attach event listener to the theme button
+// Selection of theme button
 let themeButton = document.getElementById("theme-btn");
-themeButton.addEventListener("click", themeChanger);
+
+themeButton.addEventListener("click",themeChanger);
+
+// IIFE fuction which checks the localStorage and applies the presviously set theme
+(function (){
+     let currentTheme = localStorage.getItem("theme");
+     if(currentTheme == null){
+          root.setAttribute("color-scheme","light");
+          themeButton.innerHTML = `<i class="fa-solid fa-moon"></i>`;
+          themeButton.style.backgroundColor="#0D4C92";
+          localStorage.setItem("theme","light");
+          return;
+     }
+
+     switch(currentTheme){
+          case "light":
+               root.setAttribute("color-scheme","light");
+               themeButton.innerHTML = `<i class="fa-solid fa-moon"></i>`;
+               themeButton.style.backgroundColor="#0D4C92";
+               break;
+          case "dark":
+               root.setAttribute("color-scheme","dark");
+               themeButton.innerHTML = `<i class="fa-solid fa-sun"></i>`;
+               themeButton.style.backgroundColor="#FB2576";
+               themeButton.childNodes[0].style.color = "black";
+               break;
+     }
+})();
+
+// function for handeling theme button changes
+function themeChanger(){
+     let root = document.getElementById("root");
+     // let themeIcon = document.querySelector("#themeButton i");
+     if(root.getAttribute("color-scheme") == "light"){
+          root.setAttribute("color-scheme","dark");
+          themeButton.innerHTML = `<i class="fa-solid fa-sun"></i>`;
+          themeButton.style.backgroundColor="#FB2576";
+          themeButton.childNodes[0].style.color = "black";
+          localStorage.setItem("theme","dark");
+     }
+     else if(root.getAttribute("color-scheme") == "dark"){
+          root.setAttribute("color-scheme","light");
+          themeButton.innerHTML = `<i class="fa-solid fa-moon"></i>`;
+          themeButton.style.backgroundColor="#0D4C92";
+          themeButton.childNodes[0].style.color = "white";
+          localStorage.setItem("theme","light");
+     }
+}

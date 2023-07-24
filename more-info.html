@@ -8,13 +8,13 @@
      <link rel="shortcut icon" href="./images/icon.png" type="image/x-icon">
      <title id="page-title">Superhero Hunter</title>
 
-     <!-- Google Fonts -->
+     <!-- Google fonts -->
      <link rel="preconnect" href="https://fonts.googleapis.com">
      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
      <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,200;0,300;0,600;0,900;1,100;1,200;1,300;1,800&display=swap"
           rel="stylesheet">
 
-     <!-- Fontawesome -->
+     <!-- fontawesome -->
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
           integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
           crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -35,7 +35,7 @@
                     <span>Superhero Hunter</span>
                </a>
           </div>
-          <!-- Theme Button and Navigation Buttons -->
+          <!-- Theme Button and Favourites Button -->
           <div class="flex-row favAndTheme-btn">
                <button id="theme-btn" class="btn"><i class="fa-solid fa-moon"></i></button>
                <a class="flex-row link-to-different-page" href="./favorites.html">
@@ -47,10 +47,10 @@
           </div>
      </nav>
 
-     <!-- Information Container -->
+     <!-- Info Container -->
      <div class="flex-row info">
           <section class="flex-col" id="info-container">
-               <!-- The structure of the data to be added to favourites using DOM manipulation -->
+               <!-- Sturcture of the data that is added to favourites using DOM manipulation -->
                <!-- <div class="flex-row hero-name">${heroInfo.name}</div>
                <div class="flex-row hero-img-and-more-info">
                     <img id="portraitImage" class="hero-img" src="${heroInfo.portraitImage}" alt="">
@@ -70,8 +70,8 @@
                          </div>
                     </div>
                </div>
-               <div class="flex-col hero-description">
-                    <b>Description:</b>
+               <div class="flex-col hero-discription">
+                    <b>Discription:</b>
                     <p>${heroInfo.description != "" ? heroInfo.description : "No Description Available"}</p>
                </div>
                <div style="display:none;">
@@ -89,7 +89,8 @@
           </section>
      </div>
 
-     <!-- Toasts for notifying the user that a character is added or removed from favourites -->
+     
+     <!-- Toasts for notifying user that character is added or removed from favourites -->
      <span data-visiblity="hide" class="fav-toast">Added to Favourites</span>
      <span data-visiblity="hide" class="remove-toast">Removed from Favourites</span>
 
