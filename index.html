@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Superhero Hunter App</title>
+    <!-- Add Bootstrap CSS link here -->
+</head>
+<body>
+    <div class="container mt-5">
+        <!-- Home Page Content -->
+        <div id="homePage">
+            <h1>Superhero Hunter</h1>
+            <input type="text" id="searchInput" placeholder="Search Superheroes">
+            <div id="superheroesList"></div>
+        </div>
+
+        <!-- Superhero Page Content -->
+        <div id="superheroPage" style="display: none;">
+            <h2 id="superheroName"></h2>
+            <img id="superheroImage" src="" alt="Superhero Image">
+            <p id="superheroBio"></p>
+            <!-- Additional information about the superhero can be displayed here -->
+        </div>
+
+        <!-- My Favourite Superheroes Page Content -->
+        <div id="favouritesPage" style="display: none;">
+            <h2>My Favourite Superheroes</h2>
+            <ul id="favouritesList"></ul>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
