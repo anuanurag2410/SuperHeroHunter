@@ -1,30 +1,32 @@
 // API keys (Replace these with your Marvel API keys)
-const publicKey = 'YOUR_PUBLIC_KEY';
-const privateKey = 'YOUR_PRIVATE_KEY';
+const publicKey = '5034563621fa2511fc3a1badc87481c4';
+const privateKey = 'fec57671b7ca7cc19b95191ef7718c65399be1d2';
 
 // API Base URL
 const baseURL = 'https://gateway.marvel.com:443/v1/public';
+const charactersEndpoint = '/characters';
 
 // Function to generate the MD5 hash
 function generateMD5Hash(value) {
-  return MD5(value).toString();
-}
+    return MD5(value).toString();
+  }
 
 // Function to fetch superheroes data from the Marvel API
 async function fetchSuperheroes(searchQuery) {
-  const timestamp = new Date().getTime();
-  const hash = generateMD5Hash(timestamp + privateKey + publicKey);
-  const url = `${baseURL}/characters?ts=${timestamp}&apikey=${publicKey}&hash=${hash}&nameStartsWith=${searchQuery}`;
-
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
-    return data.data.results;
-  } catch (error) {
-    console.error('Error fetching superheroes:', error);
-    return [];
+    const timestamp = new Date().getTime();
+    const hash = generateMD5Hash(timestamp + privateKey + publicKey);
+  
+    const url = `${baseURL}${charactersEndpoint}?ts=${timestamp}&apikey=${publicKey}&hash=${hash}&nameStartsWith=${searchQuery}`;
+  
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      return data.data.results;
+    } catch (error) {
+      console.error('Error fetching superheroes:', error);
+      return [];
+    }
   }
-}
 
 // Function to display superheroes list on the Home Page
 function displaySuperheroes(superheroes) {
