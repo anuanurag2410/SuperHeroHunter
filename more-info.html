@@ -6,7 +6,7 @@
      <meta http-equiv="X-UA-Compatible" content="IE=edge">
      <meta name="viewport" content="width=device-width, initial-scale=1.0">
      <link rel="shortcut icon" href="./images/icon.png" type="image/x-icon">
-     <title>Superhero Hunter</title>
+     <title id="page-title">Superhero Hunter</title>
 
      <!-- Google Fonts -->
      <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,7 +21,7 @@
 
      <!-- Custom Stylesheet -->
      <link rel="stylesheet" href="./css/styles.css">
-     <link rel="stylesheet" href="./css/favorites.css">
+     <link rel="stylesheet" href="./css/more-info.css">
 </head>
 
 <body>
@@ -35,56 +35,69 @@
                     <span>Superhero Hunter</span>
                </a>
           </div>
-          <!-- Theme Button and Home Button -->
+          <!-- Theme Button and Navigation Buttons -->
           <div class="flex-row favAndTheme-btn">
                <button id="theme-btn" class="btn"><i class="fa-solid fa-moon"></i></button>
+               <a class="flex-row link-to-different-page" href="./favorites.html">
+                    <button class="btn fav-btn"> <i class="fa-solid fa-heart fav-icon"></i> &nbsp; Favourites</button>
+               </a>
                <a class="flex-row link-to-different-page" href="./index.html">
                     <button class="btn fav-btn"> <i class="fa-solid fa-house"></i> &nbsp; Home</button>
                </a>
           </div>
      </nav>
 
-     <!-- Section to display favourite characters -->
-     <div class="favourite-characters">
-          <div class="flex-row cards-container" id="container">
-               <!-- The structure of the data will be added using DOM manipulation -->
-               <!-- <div class="flex-col card">
-                    <img src="${character.squareImage}" alt="">
-                    <span class="name">${character.name}</span>
-                    <span class="id">Id : ${character.id}</span>
-                    <span class="comics">Comics : ${character.comics}</span>
-                    <span class="series">Series : ${character.series}</span>
-                    <span class="stories">Stories : ${character.stories}</span>
-                    <a class="character-info" href="./more-info.html">
-                         <button class="btn"><i class="fa-solid fa-circle-info"></i> &nbsp; More Info</button>
-                    </a>
-                    <div style="display:none;">
-                         <span>${character.id}</span>
-                         <span>${character.name}</span>
-                         <span>${character.comics}</span>
-                         <span>${character.series}</span>
-                         <span>${character.stories}</span>
-                         <span>${character.description}</span>
-                         <span>${character.landscapeImage}</span>
-                         <span>${character.portraitImage}</span>
-                         <span>${character.squareImage}</span>
+     <!-- Information Container -->
+     <div class="flex-row info">
+          <section class="flex-col" id="info-container">
+               <!-- The structure of the data to be added to favourites using DOM manipulation -->
+               <!-- <div class="flex-row hero-name">${heroInfo.name}</div>
+               <div class="flex-row hero-img-and-more-info">
+                    <img id="portraitImage" class="hero-img" src="${heroInfo.portraitImage}" alt="">
+                    <img style="display:none;" id="landscapeImage" src="${heroInfo.landscapeImage}" alt="">
+                    <div class="flex-col more-info">
+                         <div class="flex-row id">
+                              <b>ID:</b><span>${heroInfo.id}</span>
+                         </div>
+                         <div class="flex-row comics">
+                              <b>Comics:</b><span>${heroInfo.comics}</span>
+                         </div>
+                         <div class="flex-row series">
+                              <b>Series:</b><span>${heroInfo.series}</span>
+                         </div>
+                         <div class="flex-row stories">
+                              <b>Stories:</b><span>${heroInfo.stories}</span>
+                         </div>
                     </div>
-                    <button class="btn remove-btn"><i class="fa-solid fa-heart-circle-minus"></i> &nbsp; Remove from Favourites</button>
-               </div> -->
-          </div>
+               </div>
+               <div class="flex-col hero-description">
+                    <b>Description:</b>
+                    <p>${heroInfo.description != "" ? heroInfo.description : "No Description Available"}</p>
+               </div>
+               <div style="display:none;">
+                    <span>${heroInfo.name}</span>
+                    <span>${heroInfo.portraitImage}</span>
+                    <span>${heroInfo.landscapeImage}</span>
+                    <span>${heroInfo.id}</span>
+                    <span>${heroInfo.comics}</span>
+                    <span>${heroInfo.series}</span>
+                    <span>${heroInfo.stories}</span>
+                    <span>${heroInfo.squareImage}</span>
+                    <span>${heroInfo.description}</span>
+               </div>
+               <button class="btn add-to-fav-btn">${favouritesCharacterIDs.has(`${heroInfo.id}`) ? "<i class=\"fa-solid fa-heart-circle-minus\"></i> &nbsp; Remove from Favourites" :"<i class=\"fa-solid fa-heart fav-icon\"></i> &nbsp; Add to Favourites</button>"} -->
+          </section>
      </div>
 
-     <!-- Toast message for "Removed from Favourites" -->
+     <!-- Toasts for notifying the user that a character is added or removed from favourites -->
+     <span data-visiblity="hide" class="fav-toast">Added to Favourites</span>
      <span data-visiblity="hide" class="remove-toast">Removed from Favourites</span>
 
-     <!-- Background image -->
+     <!-- Background Image -->
      <img class="bg-img" src="./images/background-light-img.png" alt="">
 
-     <!-- <img id="delete-all-img" src="./images/giphy.gif" alt="" srcset=""> -->
-
-     <!-- JavaScript file for favourites functionality -->
-     <script src="./js/favorites.js"></script>
-
+     <!-- External Script file -->
+     <script defer src="./js/more-info.js"></script>
 </body>
 
 </html>
