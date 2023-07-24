@@ -13,8 +13,8 @@ async function searchHeroes(searchText) {
     }
 
     // Marvel API credentials
-    const PUBLIC_KEY = "9ab871748d83ae2eb5527ffd69e034de";
-    const PRIVATE_KEY = "ad79003cf7316d9bd72c6eda71d1c93d7e807e90";
+    const PUBLIC_KEY = "5034563621fa2511fc3a1badc87481c4";
+    const PRIVATE_KEY = "fec57671b7ca7cc19b95191ef7718c65399be1d2";
     const timestamp = new Date().getTime();
     const hash = "d35377547e551cd64a60657d2517bb7f"; // MD5 hash
 
